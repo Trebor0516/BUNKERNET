@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Login - BUNKERNET</title>
+
+<!-- CSS -->
+<link rel="stylesheet" href="login.css">
+
+<!-- GOOGLE FONT -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- FONT AWESOME -->
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+</head>
+
+<body>
+
+<div class="login-container">
+
+    <!-- HEADER NEGRO -->
+    <div class="logo">
+
+        <img src="logo.png" alt="Logo">
+
+        <h1>BUNKERNET</h1>
+
+        <p>
+            
+        </p>
+
+    </div>
+
+    <!-- FORM -->
+    <div class="form-area">
+
+        <!-- INPUT -->
+        <div class="input-group">
+
+            <input
+                type="text"
+                id="nombre"
+                placeholder="Ingresa tu nombre"
+            >
+
+        </div>
+
+        <!-- BOTON -->
+        <button class="login-btn" onclick="entrarChat()">
+
+            Ingresar al Chat
+
+        </button>
+
+        <!-- DIVIDER -->
+        <div class="divider">
+
+            <span>o continuar con</span>
+
+        </div>
+
+        <!-- GOOGLE -->
+        <div class="social-buttons">
+
+            <button class="social-btn google">
+
+                <i class="fa-brands fa-google"></i>
+
+                Continuar con Google
+
+            </button>
+
+        </div>
+
+        <!-- AUTO USER -->
+        <div class="auto-user">
+
+            Si no ingresas un nombre se generará automáticamente:
+            <strong>Usuario_123</strong>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+function entrarChat(){
+
+    let nombre = document.getElementById("nombre").value;
+
+    if(nombre.trim() === ""){
+
+        nombre = "Usuario_" + Math.floor(Math.random() * 999);
+
+    }
+
+    localStorage.setItem("usuario", nombre);
+
+    window.location.href = "chat.html";
+}
+
+</script>
+
+</body>
+</html>

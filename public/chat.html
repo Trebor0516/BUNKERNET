@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>BUNKERNET</title>
+
+<link rel="stylesheet" href="chat.css">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="mockup">
+
+    <!-- HEADER -->
+    <header class="header">
+
+        <div class="logo">
+
+            <img src="logo.png" alt="Logo">
+
+            <h1>BUNKERNET</h1>
+
+        </div>
+
+        <!-- USUARIO -->
+        <div class="user-box">
+
+            <span id="usuarioNombre">Usuario_001</span>
+
+            <div class="online"></div>
+
+        </div>
+
+    </header>
+
+    <!-- CONTENIDO -->
+    <div class="content">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+
+            <h2>Usuarios conectados</h2>
+
+            <!-- USUARIO -->
+            <div class="user">
+
+                <div class="user-left">
+
+                    <div class="avatar purple">👤</div>
+
+                    <span>Usuario_123</span>
+
+                </div>
+
+                <div class="status active"></div>
+
+            </div>
+
+            <!-- USUARIO -->
+            <div class="user">
+
+                <div class="user-left">
+
+                    <div class="avatar green">👤</div>
+
+                    <span>Usuario_456</span>
+
+                </div>
+
+                <div class="status active"></div>
+
+            </div>
+
+            <!-- USUARIO OFFLINE -->
+            <div class="user">
+
+                <div class="user-left">
+
+                    <div class="avatar orange">👤</div>
+
+                    <span>Usuario_789</span>
+
+                </div>
+
+                <div class="status offline"></div>
+
+            </div>
+
+        </aside>
+
+        <!-- CHAT -->
+        <main class="chat">
+
+            <!-- MENSAJES -->
+            <div class="messages">
+
+                <!-- MENSAJE SISTEMA -->
+                <div class="system-message">
+
+                    Usuario_123 se unió al chat
+
+                </div>
+
+                <!-- MENSAJE -->
+                <div class="message">
+
+                    <div class="avatar purple">👤</div>
+
+                    <div class="message-content">
+
+                        <div class="username purple-name">
+
+                            Usuario_123
+
+                        </div>
+
+                        <div class="msg-box purple-box">
+
+                            <p>¡Hola a todos! 👋</p>
+
+                        </div>
+
+                        <div class="time">
+
+                            10:32 AM
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- MENSAJE -->
+                <div class="message">
+
+                    <div class="avatar green">👤</div>
+
+                    <div class="message-content">
+
+                        <div class="username green-name">
+
+                            Usuario_456
+
+                        </div>
+
+                        <div class="msg-box green-box">
+
+                            <p>¿Cómo están?</p>
+
+                        </div>
+
+                        <div class="time">
+
+                            10:35 AM
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- MENSAJE SISTEMA -->
+                <div class="system-message">
+
+                    Usuario_789 salió del chat
+
+                </div>
+
+            </div>
+
+            <!-- INPUT -->
+            <div class="chat-input">
+
+                <input
+                    type="text"
+                    placeholder="Escribe tu mensaje aquí..."
+                >
+
+                <button>
+
+                    ➤ Enviar
+
+                </button>
+
+            </div>
+
+        </main>
+
+    </div>
+
+</div>
+
+<script>
+
+const usuario = localStorage.getItem("usuario");
+
+if(usuario){
+    document.getElementById("usuarioNombre").innerText = usuario;
+}
+
+</script>
+
+</body>
+</html>
