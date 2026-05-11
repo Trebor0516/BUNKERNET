@@ -9,18 +9,22 @@ const server = http.createServer(app);
 
 const wss = new WebSocket.Server({ server });
 
-// ARCHIVOS PUBLICOS
+
+// PUBLIC
 app.use(express.static(path.join(__dirname, "../public")));
 
-// LOGIN.HTML
+
+// LOGIN
 app.get("/", (req, res) => {
 
     res.sendFile(path.join(__dirname, "../public/login.html"));
 
 });
 
-// LISTA USUARIOS
+
+// USUARIOS
 let usuarios = [];
+
 
 // NUEVA CONEXION
 wss.on("connection", (ws) => {
@@ -30,45 +34,63 @@ wss.on("connection", (ws) => {
     // RECIBIR MENSAJES
     ws.on("message", (data) => {
 
-        const mensaje = JSON.parse(data);
+        try {
 
-        // NUEVO USUARIO
-        if (mensaje.tipo === "nuevo_usuario") {
+            const mensaje = JSON.parse(data.toString());
 
-            ws.usuario = mensaje.usuario;
+            // NUEVO USUARIO
+            if (mensaje.tipo === "nuevo_usuario") {
 
-            usuarios.push({
-                socket: ws,
-                nombre: mensaje.usuario
-            });
+                ws.usuario = mensaje.usuario;
 
-            // ACTUALIZAR USUARIOS
-            actualizarUsuarios();
+                usuarios.push({
 
-            // MENSAJE SISTEMA
-            broadcast({
+                    socket: ws,
 
-                tipo: "sistema",
-                texto: `${mensaje.usuario} se unió al chat`
+                    nombre: mensaje.usuario
 
-            });
+                });
 
-        }
+                // ACTUALIZAR LISTA
+                actualizarUsuarios();
 
-        // MENSAJE NORMAL
-        if (mensaje.tipo === "mensaje") {
+                // MENSAJE SISTEMA
+                broadcast({
 
-            broadcast({
+                    tipo: "sistema",
 
-                tipo: "mensaje",
-                usuario: mensaje.usuario,
-                texto: mensaje.texto,
-                hora: new Date().toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit"
-                })
+                    texto: `${mensaje.usuario} se unió al chat`
 
-            });
+                });
+
+            }
+
+            // MENSAJE NORMAL
+            if (mensaje.tipo === "mensaje") {
+
+                broadcast({
+
+                    tipo: "mensaje",
+
+                    usuario: mensaje.usuario,
+
+                    texto: mensaje.texto,
+
+                    hora: new Date().toLocaleTimeString([], {
+
+                        hour: "2-digit",
+
+                        minute: "2-digit"
+
+                    })
+
+                });
+
+            }
+
+        } catch (error) {
+
+            console.log("Error JSON:", error.message);
 
         }
 
@@ -88,6 +110,7 @@ wss.on("connection", (ws) => {
             broadcast({
 
                 tipo: "sistema",
+
                 texto: `${ws.usuario} abandonó el chat`
 
             });
@@ -97,6 +120,7 @@ wss.on("connection", (ws) => {
     });
 
 });
+
 
 // ENVIAR A TODOS
 function broadcast(data) {
@@ -113,19 +137,20 @@ function broadcast(data) {
 
 }
 
+
 // ACTUALIZAR USUARIOS
 function actualizarUsuarios() {
-
-    const lista = usuarios.map(u => u.nombre);
 
     broadcast({
 
         tipo: "usuarios",
-        lista: lista
+
+        lista: usuarios.map(u => u.nombre)
 
     });
 
 }
+
 
 // SERVIDOR
 server.listen(3000, () => {
