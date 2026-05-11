@@ -14,7 +14,7 @@ El sistema permite:
   - Asignacion automatica de nombres temporales.
 
 ## **Integrantes**
-  - 
+  - Iris Choque Kantuta
   -
   - Jazmin Anai Quelca Cala
   -
