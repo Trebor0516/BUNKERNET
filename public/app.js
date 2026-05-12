@@ -198,28 +198,61 @@ document.addEventListener("DOMContentLoaded", () => {
     // ===============================
     // RECIBIR MENSAJES
     // ===============================
+socket.onmessage = (event) => {
 
-    socket.onmessage = (event) => {
+    let data;
 
-        const data = JSON.parse(event.data);
+    try {
+        data = JSON.parse(event.data);
+    } catch (e) {
+        console.log("Error JSON:", e);
+        return;
+    }
 
-        // ===============================
-        // SISTEMA
-        // ===============================
+    // ===============================
+    // HISTORIAL
+    // ===============================
+    if (data.tipo === "historial" && Array.isArray(data.mensajes)) {
 
-        if (data.tipo === "sistema") {
+        data.mensajes.forEach(m => {
+
+            const color = obtenerColor(m.usuario);
 
             messages.innerHTML += `
+                <div class="message">
+                    <div class="avatar ${color}">👤</div>
 
-                <div class="system-message">
+                    <div class="message-content">
+                        <div class="username ${color}-name">
+                            ${m.usuario}
+                        </div>
 
-                    ${data.texto}
+                        <div class="msg-box ${color}-box">
+                            <p>${m.mensaje}</p>
+                        </div>
 
+                        <div class="time">
+                            ${m.fecha || ""}
+                        </div>
+                    </div>
                 </div>
-
             `;
+        });
 
-        }
+        messages.scrollTop = messages.scrollHeight;
+        return;
+    }
+
+    // ===============================
+    // SISTEMA
+    // ===============================
+    if (data.tipo === "sistema") {
+        messages.innerHTML += `
+            <div class="system-message">
+                ${data.texto}
+            </div>
+        `;
+    }
 
         // ===============================
         // MENSAJE NORMAL

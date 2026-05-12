@@ -90,6 +90,7 @@ body{
 .content{
     flex:1;
     display:flex;
+    overflow:hidden; /* 🔥 evita que todo se desborde */
 }
 
 /* SIDEBAR */
@@ -192,13 +193,13 @@ body{
 
 .chat{
     flex:1;
-
     display:flex;
     flex-direction:column;
-
     padding:25px;
-
     background:#f8fafc;
+
+    height:100%;
+    overflow:hidden; /* 🔥 CLAVE */
 }
 
 /* MENSAJES */
@@ -207,6 +208,8 @@ body{
     flex:1;
     overflow-y:auto;
     padding-right:10px;
+    padding-bottom:15px; /* evita que tape el input */
+    min-height:0; /* 🔥 MUY IMPORTANTE en flex */
 }
 
 /* CADA MENSAJE */
@@ -295,6 +298,8 @@ body{
     gap:15px;
 
     margin-top:10px;
+
+    flex-shrink:0; /* 🔥 evita que desaparezca */
 }
 
 /* INPUT TEXTO */
@@ -454,4 +459,20 @@ body{
 
 .pink-box {
     background: #fce7f3;
+}
+
+.avatar-img {
+
+    width: 40px;
+
+    height: 40px;
+
+    border-radius: 50%;
+
+    object-fit: cover;
+
+}
+
+.messages{
+    scroll-behavior:smooth;
 }

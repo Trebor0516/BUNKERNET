@@ -1,211 +1,155 @@
 const express = require("express");
-const http = require("http");
 const path = require("path");
+const http = require("http");
 const WebSocket = require("ws");
+
+const app = express();
+const server = http.createServer(app);
+const wss = new WebSocket.Server({ server });
 
 const {
     guardarMensaje,
     obtenerMensajes
 } = require("./database");
 
-// =======================
-// EXPRESS
-// =======================
+// ===============================
+// PUBLIC
+// ===============================
+app.use(express.static(path.join(__dirname, "../public")));
 
-const app = express();
-
-app.use(express.static(
-    path.join(__dirname, "../public")
-));
-
-// =======================
-// HTTP SERVER
-// =======================
-
-const server = http.createServer(app);
-
-// =======================
-// WEBSOCKET SERVER
-// =======================
-
-const wss = new WebSocket.Server({
-    server
+// LOGIN
+app.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname, "../public/login.html"));
 });
 
-// =======================
-// USUARIOS CONECTADOS
-// =======================
-
+// ===============================
+// USUARIOS
+// ===============================
 let usuarios = [];
 
-// =======================
-// NUEVA CONEXIÓN
-// =======================
-
+// ===============================
+// CONEXIÓN
+// ===============================
 wss.on("connection", (ws) => {
 
     console.log("Usuario conectado");
 
-// =======================
-// RECIBIR MENSAJES
-// =======================
+    // ENVIAR HISTORIAL CON HORA SI EXISTE
+    obtenerMensajes((mensajes) => {
+        ws.send(JSON.stringify({
+            tipo: "historial",
+            mensajes: mensajes
+        }));
+    });
 
+    // ===============================
+    // MENSAJES
+    // ===============================
     ws.on("message", (data) => {
-
-        let mensaje;
 
         try {
 
-            mensaje = JSON.parse(data);
+            const mensaje = JSON.parse(data.toString());
+
+            // -----------------------
+            // NUEVO USUARIO
+            // -----------------------
+            if (mensaje.tipo === "nuevo_usuario") {
+
+                ws.usuario = mensaje.usuario;
+
+                // evitar duplicados
+                usuarios = usuarios.filter(u => u.socket !== ws);
+
+                usuarios.push({
+                    socket: ws,
+                    nombre: mensaje.usuario
+                });
+
+                actualizarUsuarios();
+
+                broadcast({
+                    tipo: "sistema",
+                    texto: `${mensaje.usuario} se unió al chat`
+                });
+            }
+
+            // -----------------------
+            // MENSAJE NORMAL
+            // -----------------------
+            if (mensaje.tipo === "mensaje") {
+
+                const hora = new Date().toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit"
+                });
+
+                guardarMensaje(
+                    mensaje.usuario,
+                    mensaje.texto,
+                    hora // 👈 AHORA SE GUARDA LA HORA
+                );
+
+                broadcast({
+                    tipo: "mensaje",
+                    usuario: mensaje.usuario,
+                    texto: mensaje.texto,
+                    hora: hora
+                });
+            }
 
         } catch (error) {
-
-            console.error(
-                "JSON inválido:",
-                error.message
-            );
-
-            return;
-
-        }
-
-// =======================
-// NUEVO USUARIO
-// =======================
-
-        if (mensaje.tipo === "nuevo_usuario") {
-
-            // EVITAR DUPLICADOS
-            usuarios = usuarios.filter(
-                u => u.nombre !== mensaje.usuario
-            );
-
-            usuarios.push({
-                socket: ws,
-                nombre: mensaje.usuario
-            });
-
-            console.log(
-                `${mensaje.usuario} se conectó`
-            );
-
-            // ENVIAR HISTORIAL
-            obtenerMensajes((mensajes) => {
-
-                ws.send(JSON.stringify({
-                    tipo: "historial",
-                    mensajes
-                }));
-
-            });
-
-            // ACTUALIZAR LISTA
-            actualizarUsuarios();
-
-        }
-
-// =======================
-// MENSAJE NORMAL
-// =======================
-
-        if (mensaje.tipo === "mensaje") {
-
-            // VALIDACIÓN
-            if (
-                !mensaje.usuario ||
-                !mensaje.texto
-            ) {
-                return;
-            }
-
-            // LIMITAR TAMAÑO
-            if (mensaje.texto.length > 500) {
-                return;
-            }
-
-            // GUARDAR SQLITE
-            guardarMensaje(
-                mensaje.usuario,
-                mensaje.texto
-            );
-
-            // ENVIAR A TODOS
-            usuarios.forEach((u) => {
-
-                if (
-                    u.socket.readyState ===
-                    WebSocket.OPEN
-                ) {
-
-                    u.socket.send(JSON.stringify({
-                        tipo: "mensaje",
-                        usuario: mensaje.usuario,
-                        texto: mensaje.texto
-                    }));
-
-                }
-
-            });
-
+            console.log("Error JSON:", error.message);
         }
 
     });
 
-// =======================
-// DESCONECTAR
-// =======================
-
+    // ===============================
+    // DESCONECTAR
+    // ===============================
     ws.on("close", () => {
 
-        usuarios = usuarios.filter(
-            u => u.socket !== ws
-        );
+        if (ws.usuario) {
 
-        console.log("Usuario desconectado");
+            usuarios = usuarios.filter(u => u.socket !== ws);
 
-        actualizarUsuarios();
+            actualizarUsuarios();
+
+            broadcast({
+                tipo: "sistema",
+                texto: `${ws.usuario} abandonó el chat`
+            });
+        }
 
     });
 
 });
 
-// =======================
-// ACTUALIZAR USUARIOS
-// =======================
-
-function actualizarUsuarios() {
-
-    const listaUsuarios =
-        usuarios.map(u => u.nombre);
-
-    usuarios.forEach((u) => {
-
-        if (
-            u.socket.readyState ===
-            WebSocket.OPEN
-        ) {
-
-            u.socket.send(JSON.stringify({
-                tipo: "usuarios",
-                usuarios: listaUsuarios
-            }));
-
+// ===============================
+// BROADCAST
+// ===============================
+function broadcast(data) {
+    wss.clients.forEach(cliente => {
+        if (cliente.readyState === WebSocket.OPEN) {
+            cliente.send(JSON.stringify(data));
         }
-
     });
-
 }
 
-// =======================
-// INICIAR SERVIDOR
-// =======================
+// ===============================
+// USUARIOS
+// ===============================
+function actualizarUsuarios() {
+    broadcast({
+        tipo: "usuarios",
+        lista: usuarios.map(u => u.nombre)
+    });
+}
 
-const PORT = process.env.PORT || 3000;
-
-server.listen(PORT, () => {
-
-    console.log(
-        `Servidor iniciado en puerto ${PORT}`
-    );
-
+// ===============================
+// SERVER
+// ===============================
+server.listen(3000, () => {
+    console.log("Servidor iniciado:");
+    console.log("http://localhost:3000");
 });
