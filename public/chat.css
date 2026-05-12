@@ -375,3 +375,83 @@ body{
         font-size:18px;
     }
 }
+
+/* AVATARES */
+
+.purple {
+    background: #a855f7;
+}
+
+.green {
+    background: #22c55e;
+}
+
+.orange {
+    background: #f97316;
+}
+
+.blue {
+    background: #3b82f6;
+}
+
+.red {
+    background: #ef4444;
+}
+
+.pink {
+    background: #ec4899;
+}
+
+
+/* NOMBRES */
+
+.purple-name {
+    color: #a855f7;
+}
+
+.green-name {
+    color: #22c55e;
+}
+
+.orange-name {
+    color: #f97316;
+}
+
+.blue-name {
+    color: #3b82f6;
+}
+
+.red-name {
+    color: #ef4444;
+}
+
+.pink-name {
+    color: #ec4899;
+}
+
+
+/* MENSAJES */
+
+.purple-box {
+    background: #f3e8ff;
+}
+
+.green-box {
+    background: #dcfce7;
+}
+
+.orange-box {
+    background: #ffedd5;
+}
+
+.blue-box {
+    background: #dbeafe;
+}
+
+.red-box {
+    background: #fee2e2;
+}
+
+.pink-box {
+    background: #fce7f3;
+}

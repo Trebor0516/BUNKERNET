@@ -1,14 +1,61 @@
 
 // ===============================
-// LOGIN
+// FIREBASE
 // ===============================
 
-function entrarChat() {
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
-    let nombre = document.getElementById("nombre").value.trim();
+import {
+
+    getAuth,
+    GoogleAuthProvider,
+    signInWithPopup
+
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+
+// ===============================
+// CONFIG FIREBASE
+// ===============================
+
+const firebaseConfig = {
+
+    apiKey: "AIzaSyCAY-DfecKMiv3S_sOefx7wj44vykktpUc",
+
+    authDomain: "bunkernet-507ad.firebaseapp.com",
+
+    projectId: "bunkernet-507ad",
+
+    storageBucket: "bunkernet-507ad.firebasestorage.app",
+
+    messagingSenderId: "153333768955",
+
+    appId: "1:153333768955:web:8ca609340ba2b28f17465e"
+
+};
+
+
+// ===============================
+// INICIAR FIREBASE
+// ===============================
+
+const app = initializeApp(firebaseConfig);
+
+const auth = getAuth(app);
+
+const provider = new GoogleAuthProvider();
+
+
+// ===============================
+// LOGIN MANUAL
+// ===============================
+
+window.entrarChat = function () {
+
+    let nombre = document.getElementById("nombre")?.value.trim();
 
     // SI ESTA VACIO
-    if (nombre === "") {
+    if (!nombre || nombre === "") {
 
         nombre = "Usuario_" + Math.floor(100 + Math.random() * 900);
 
@@ -17,10 +64,41 @@ function entrarChat() {
     // GUARDAR USUARIO
     sessionStorage.setItem("usuario", nombre);
 
-    // IR AL CHAT
+    // REDIRIGIR
     window.location.href = "chat.html";
 
-}
+};
+
+
+// ===============================
+// LOGIN GOOGLE
+// ===============================
+
+window.loginGoogle = function () {
+
+    signInWithPopup(auth, provider)
+
+    .then((result) => {
+
+        const user = result.user;
+
+        // GUARDAR
+        sessionStorage.setItem("usuario", user.displayName);
+
+        // REDIRIGIR
+        window.location.href = "chat.html";
+
+    })
+
+    .catch((error) => {
+
+        console.log(error);
+
+        alert("Error al iniciar sesión con Google");
+
+    });
+
+};
 
 
 // ===============================
@@ -36,7 +114,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     }
 
-    // OBTENER USUARIO
+    // USUARIO
     const usuario = sessionStorage.getItem("usuario");
 
     // SI NO EXISTE
@@ -48,10 +126,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     }
 
-    // MOSTRAR USUARIO ARRIBA
-    const usuarioNombre = document.getElementById("usuarioNombre");
-
-    usuarioNombre.innerText = usuario;
+    // MOSTRAR USUARIO
+    document.getElementById("usuarioNombre").innerText = usuario;
 
     // ELEMENTOS
     const input = document.querySelector(".chat-input input");
@@ -62,7 +138,43 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const sidebar = document.querySelector(".sidebar");
 
-    // SOCKET
+    // ===============================
+    // COLORES
+    // ===============================
+
+    const colores = [
+
+        "purple",
+        "green",
+        "orange",
+        "blue",
+        "red",
+        "pink"
+
+    ];
+
+    // ===============================
+    // OBTENER COLOR
+    // ===============================
+
+    function obtenerColor(usuario) {
+
+        let suma = 0;
+
+        for (let i = 0; i < usuario.length; i++) {
+
+            suma += usuario.charCodeAt(i);
+
+        }
+
+        return colores[suma % colores.length];
+
+    }
+
+    // ===============================
+    // WEBSOCKET
+    // ===============================
+
     const socket = new WebSocket("ws://localhost:3000");
 
     // ===============================
@@ -91,7 +203,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const data = JSON.parse(event.data);
 
-        // MENSAJE SISTEMA
+        // ===============================
+        // SISTEMA
+        // ===============================
+
         if (data.tipo === "sistema") {
 
             messages.innerHTML += `
@@ -106,24 +221,29 @@ document.addEventListener("DOMContentLoaded", () => {
 
         }
 
+        // ===============================
         // MENSAJE NORMAL
+        // ===============================
+
         if (data.tipo === "mensaje") {
+
+            const color = obtenerColor(data.usuario);
 
             messages.innerHTML += `
 
                 <div class="message">
 
-                    <div class="avatar purple">👤</div>
+                    <div class="avatar ${color}">👤</div>
 
                     <div class="message-content">
 
-                        <div class="username purple-name">
+                        <div class="username ${color}-name">
 
                             ${data.usuario}
 
                         </div>
 
-                        <div class="msg-box purple-box">
+                        <div class="msg-box ${color}-box">
 
                             <p>${data.texto}</p>
 
@@ -143,7 +263,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
         }
 
+        // ===============================
         // USUARIOS CONECTADOS
+        // ===============================
+
         if (data.tipo === "usuarios") {
 
             let html = `
@@ -154,13 +277,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
             data.lista.forEach(user => {
 
+                const color = obtenerColor(user);
+
                 html += `
 
                     <div class="user">
 
                         <div class="user-left">
 
-                            <div class="avatar green">👤</div>
+                            <div class="avatar ${color}">👤</div>
 
                             <span>${user}</span>
 
@@ -180,6 +305,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // AUTO SCROLL
         messages.scrollTop = messages.scrollHeight;
+
+    };
+
+    // ===============================
+    // ERROR SOCKET
+    // ===============================
+
+    socket.onerror = (error) => {
+
+        console.log("Error WebSocket:", error);
+
+    };
+
+    // ===============================
+    // DESCONECTADO
+    // ===============================
+
+    socket.onclose = () => {
+
+        console.log("Desconectado");
 
     };
 
@@ -214,14 +359,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     }
 
+    // ===============================
     // BOTON
-    boton.addEventListener("click", () => {
+    // ===============================
 
-        enviarMensaje();
+    boton.addEventListener("click", enviarMensaje);
 
-    });
-
+    // ===============================
     // ENTER
+    // ===============================
+
     input.addEventListener("keydown", (e) => {
 
         if (e.key === "Enter") {
