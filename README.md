@@ -29,7 +29,7 @@ El sistema permite:
   - JavaScript
   
 ### **Backend**
-  -  Node.js
+  -  Server.js
   -  WebSocket (ws)
   -  Express
 
