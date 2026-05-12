@@ -41,15 +41,15 @@ Para ejecutar el proyecto se requiere:
 
 ## **Manual de instalacion,ejecucion**
   1. Clonar repositorio
-  git clone //URLfalta
+  - git clone //URLfalta
   2. Ingresar a la carpeta
-  cd //falta
+  - cd //falta
   3. Instalar dependencias
-  npm install
+  - npm install
   4. Ejecutar servidor
-  node server.js
+  - node server.js
   5. Abrir cliente 
-  Ingresar a: ///link
+  - Ingresar a: ///link
 
 
   
