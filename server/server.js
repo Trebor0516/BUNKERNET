@@ -1,117 +1,149 @@
 const express = require("express");
-const path = require("path");
 const http = require("http");
+const path = require("path");
 const WebSocket = require("ws");
+
+const {
+    guardarMensaje,
+    obtenerMensajes
+} = require("./database");
+
+// =======================
+// EXPRESS
+// =======================
 
 const app = express();
 
+app.use(express.static(
+    path.join(__dirname, "../public")
+));
+
+// =======================
+// HTTP SERVER
+// =======================
+
 const server = http.createServer(app);
 
-const wss = new WebSocket.Server({ server });
+// =======================
+// WEBSOCKET SERVER
+// =======================
 
-
-// PUBLIC
-app.use(express.static(path.join(__dirname, "../public")));
-
-
-// LOGIN
-app.get("/", (req, res) => {
-
-    res.sendFile(path.join(__dirname, "../public/login.html"));
-
+const wss = new WebSocket.Server({
+    server
 });
 
+// =======================
+// USUARIOS CONECTADOS
+// =======================
 
-// USUARIOS
 let usuarios = [];
 
+// =======================
+// NUEVA CONEXIÓN
+// =======================
 
-// NUEVA CONEXION
 wss.on("connection", (ws) => {
 
     console.log("Usuario conectado");
 
-    // RECIBIR MENSAJES
+// =======================
+// RECIBIR MENSAJES
+// =======================
+
     ws.on("message", (data) => {
+
+        let mensaje;
 
         try {
 
-            const mensaje = JSON.parse(data.toString());
-
-            // NUEVO USUARIO
-            if (mensaje.tipo === "nuevo_usuario") {
-
-                ws.usuario = mensaje.usuario;
-
-                usuarios.push({
-
-                    socket: ws,
-
-                    nombre: mensaje.usuario
-
-                });
-
-                // ACTUALIZAR LISTA
-                actualizarUsuarios();
-
-                // MENSAJE SISTEMA
-                broadcast({
-
-                    tipo: "sistema",
-
-                    texto: `${mensaje.usuario} se unió al chat`
-
-                });
-
-            }
-
-            // MENSAJE NORMAL
-            if (mensaje.tipo === "mensaje") {
-
-                broadcast({
-
-                    tipo: "mensaje",
-
-                    usuario: mensaje.usuario,
-
-                    texto: mensaje.texto,
-
-                    hora: new Date().toLocaleTimeString([], {
-
-                        hour: "2-digit",
-
-                        minute: "2-digit"
-
-                    })
-
-                });
-
-            }
+            mensaje = JSON.parse(data);
 
         } catch (error) {
 
-            console.log("Error JSON:", error.message);
+            console.error(
+                "JSON inválido:",
+                error.message
+            );
+
+            return;
 
         }
 
-    });
+// =======================
+// NUEVO USUARIO
+// =======================
 
-    // DESCONECTAR
-    ws.on("close", () => {
+        if (mensaje.tipo === "nuevo_usuario") {
 
-        if (ws.usuario) {
-
+            // EVITAR DUPLICADOS
             usuarios = usuarios.filter(
-                u => u.socket !== ws
+                u => u.nombre !== mensaje.usuario
             );
 
+            usuarios.push({
+                socket: ws,
+                nombre: mensaje.usuario
+            });
+
+            console.log(
+                `${mensaje.usuario} se conectó`
+            );
+
+            // ENVIAR HISTORIAL
+            obtenerMensajes((mensajes) => {
+
+                ws.send(JSON.stringify({
+                    tipo: "historial",
+                    mensajes
+                }));
+
+            });
+
+            // ACTUALIZAR LISTA
             actualizarUsuarios();
 
-            broadcast({
+        }
 
-                tipo: "sistema",
+// =======================
+// MENSAJE NORMAL
+// =======================
 
-                texto: `${ws.usuario} abandonó el chat`
+        if (mensaje.tipo === "mensaje") {
+
+            // VALIDACIÓN
+            if (
+                !mensaje.usuario ||
+                !mensaje.texto
+            ) {
+                return;
+            }
+
+            // LIMITAR TAMAÑO
+            if (mensaje.texto.length > 500) {
+                return;
+            }
+
+            // GUARDAR SQLITE
+            guardarMensaje(
+                mensaje.usuario,
+                mensaje.texto
+            );
+
+            // ENVIAR A TODOS
+            usuarios.forEach((u) => {
+
+                if (
+                    u.socket.readyState ===
+                    WebSocket.OPEN
+                ) {
+
+                    u.socket.send(JSON.stringify({
+                        tipo: "mensaje",
+                        usuario: mensaje.usuario,
+                        texto: mensaje.texto
+                    }));
+
+                }
 
             });
 
@@ -119,17 +151,44 @@ wss.on("connection", (ws) => {
 
     });
 
+// =======================
+// DESCONECTAR
+// =======================
+
+    ws.on("close", () => {
+
+        usuarios = usuarios.filter(
+            u => u.socket !== ws
+        );
+
+        console.log("Usuario desconectado");
+
+        actualizarUsuarios();
+
+    });
+
 });
 
+// =======================
+// ACTUALIZAR USUARIOS
+// =======================
 
-// ENVIAR A TODOS
-function broadcast(data) {
+function actualizarUsuarios() {
 
-    wss.clients.forEach(cliente => {
+    const listaUsuarios =
+        usuarios.map(u => u.nombre);
 
-        if (cliente.readyState === WebSocket.OPEN) {
+    usuarios.forEach((u) => {
 
-            cliente.send(JSON.stringify(data));
+        if (
+            u.socket.readyState ===
+            WebSocket.OPEN
+        ) {
+
+            u.socket.send(JSON.stringify({
+                tipo: "usuarios",
+                usuarios: listaUsuarios
+            }));
 
         }
 
@@ -137,25 +196,16 @@ function broadcast(data) {
 
 }
 
+// =======================
+// INICIAR SERVIDOR
+// =======================
 
-// ACTUALIZAR USUARIOS
-function actualizarUsuarios() {
+const PORT = process.env.PORT || 3000;
 
-    broadcast({
+server.listen(PORT, () => {
 
-        tipo: "usuarios",
-
-        lista: usuarios.map(u => u.nombre)
-
-    });
-
-}
-
-
-// SERVIDOR
-server.listen(3000, () => {
-
-    console.log("Servidor iniciado:");
-    console.log("http://localhost:3000");
+    console.log(
+        `Servidor iniciado en puerto ${PORT}`
+    );
 
 });
