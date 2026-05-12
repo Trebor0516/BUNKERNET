@@ -41,7 +41,7 @@ Para ejecutar el proyecto se requiere:
 
 ## **Manual de instalacion,ejecucion**
   1. Clonar repositorio
-  - git clone //URLfalta
+  - git clone https://github.com/Trebor0516/BUNKERNET
   2. Ingresar a la carpeta
   - cd //falta
   3. Instalar dependencias
