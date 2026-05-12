@@ -18,7 +18,7 @@ El sistema permite:
   -
   - Jazmin Anai Quelca Cala
   -
-  -
+  - José Daniel Sanchez Mamani
   -
 
 ## **Stack tecnologico**
