@@ -14,7 +14,7 @@ El sistema permite:
   - Asignacion automatica de nombres temporales.
 
 ## **Integrantes**
-  - Iris Choque Kantuta
+  - Iris Choque
   - Robert Mauricio Gallinate Aruquipa 
   - Jazmin Anai Quelca Cala
   - Kevin Gustavo Rodriguez Mendez
