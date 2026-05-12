@@ -25,14 +25,25 @@ El sistema permite:
 
 ### **Fronted**
   - HTML
+  - CSS3
   - JavaScript
   
 ### **Backend**
   -  Node.js
+  -  WebSocket (ws)
+  -  Express
+
+### **Base de datos**
+  - Sqlite3
+
+### **Autenticacion**
+  - Firebase Authentication
 
 ### **Herramientas**
-  - GitHub
+  - Git + GitHub
   - Notion
+  - Render
+  - Visual Studio Code
 
 ## **Requisitos**
 Para ejecutar el proyecto se requiere:
@@ -50,9 +61,9 @@ Para ejecutar el proyecto se requiere:
   4. Ejecutar servidor
   - node server.js
   5. Opcion 1 : Para multiples pestañas
-  - Ingresar a: http://localhost:3000
+  - http://localhost:3000
   6. Opcion 2 : Para varias computadoras
-  -https://bunkernet.onrender.com
+  - https://bunkernet.onrender.com
 
 
   
