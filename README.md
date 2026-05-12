@@ -19,7 +19,7 @@ El sistema permite:
   - Jazmin Anai Quelca Cala
   - Kevin Gustavo Rodriguez Mendez
   - José Daniel Sanchez Mamani
-    
+  - Vismar Lopez Toco
 
 ## **Stack tecnologico**
 
