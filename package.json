@@ -2,9 +2,9 @@
   "name": "bunkernet",
   "version": "1.0.0",
   "description": "Sistema de chat colaborativo",
-  "main": "servidor/server.js",
+  "main": "server/server.js",
   "scripts": {
-    "start": "node servidor/server.js"
+    "start": "node server/server.js"
   },
   "dependencies": {
     "express": "^5.2.1",
