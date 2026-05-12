@@ -43,13 +43,16 @@ Para ejecutar el proyecto se requiere:
   1. Clonar repositorio
   - git clone https://github.com/Trebor0516/BUNKERNET
   2. Ingresar a la carpeta
-  - cd //falta
+  - cd BUNKERNET
   3. Instalar dependencias
-  - npm install
+  - npm install express ws
+  - npm install sqlite3
   4. Ejecutar servidor
   - node server.js
   5. Abrir cliente 
-  - Ingresar a: ///link
+  - Ingresar a: http://localhost:3000
+  6. Abrir:
+  -https://bunkernet.onrender.com
 
 
   
