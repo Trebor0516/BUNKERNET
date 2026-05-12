@@ -15,11 +15,11 @@ El sistema permite:
 
 ## **Integrantes**
   - Iris Choque Kantuta
-  -
+  - Robert Mauricio Gallinate Aruquipa 
   - Jazmin Anai Quelca Cala
   -
   - José Daniel Sanchez Mamani
-  -
+    
 
 ## **Stack tecnologico**
 
