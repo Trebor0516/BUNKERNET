@@ -17,7 +17,7 @@ El sistema permite:
   - Iris Choque Kantuta
   - Robert Mauricio Gallinate Aruquipa 
   - Jazmin Anai Quelca Cala
-  -
+  - Kevin Gustavo Rodriguez Mendez
   - José Daniel Sanchez Mamani
     
 
