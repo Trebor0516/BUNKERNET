@@ -31,8 +31,8 @@ El sistema permite:
   -  Node.js
 
 ### **Herramientas**
-  -GitHub
-  -Notion
+  - GitHub
+  - Notion
 
 ## **Requisitos**
 Para ejecutar el proyecto se requiere:
@@ -49,9 +49,9 @@ Para ejecutar el proyecto se requiere:
   - npm install sqlite3
   4. Ejecutar servidor
   - node server.js
-  5. Abrir cliente 
+  5. Opcion 1 : Para multiples pestañas
   - Ingresar a: http://localhost:3000
-  6. Abrir:
+  6. Opcion 2 : Para varias computadoras
   -https://bunkernet.onrender.com
 
 
