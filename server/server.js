@@ -79,10 +79,11 @@ wss.on("connection", (ws) => {
             // -----------------------
             if (mensaje.tipo === "mensaje") {
 
-                const hora = new Date().toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit"
-                });
+               const hora = new Date().toLocaleTimeString("es-BO", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false
+});
 
                 guardarMensaje(
                     mensaje.usuario,
